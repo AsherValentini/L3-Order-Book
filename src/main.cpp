@@ -3,6 +3,8 @@
 #include <vector>
 #include <stdexcept>
 #include <format>
+#include <memory>
+#include <list>
 
 enum class OrderType {
     GoodTillCancel,
@@ -70,6 +72,35 @@ class Order {
         Quantity initialQuantity_;
         Quantity remainingQuantity_;
 };
+
+using OrderPointer = std::shared_ptr<Order>;
+using OrderPointers = std::list<OrderPointer>;
+
+class OrderModify {
+    public:
+        OrderModify(OrderId orderId, Side side, Price price, Quantity quantity)
+            : orderId_{ orderId }
+            , side_{ side }
+            , price_{ price }
+            , quantity_{ quantity }
+        {}
+        OrderId GetOrderId() const { return orderId_; }
+        Side GetOrderSide() const { return side_; }
+        Price GetPrice() const { return price_; }
+        Quantity GetQuantity() const { return quantity_; }
+
+        OrderPointer toOrderPointer(OrderType type) const {
+            return std::make_shared<Order>(type, GetOrderId(), GetOrderSide(), GetPrice(), GetQuantity());
+        }
+
+    private:
+        OrderId orderId_;
+        Side side_;
+        Price price_;
+        Quantity quantity_;
+};
+
+
 
 int main() {
 	std::cout << "sanity check\n";
